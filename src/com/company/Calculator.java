@@ -69,57 +69,48 @@ public class Calculator {
     }
     static void getResult(String str, int flag) {
         int i = 0;          //счетчик
-        int firstnum = 0;   //первое число
-        int secnum = 0;     //второе число
-        int length1 = 0;    //размер первого числа (для римской системы)
-        int length2 = 0;    //размер второго числа
+        number firstnum = new number();   //первое число
+        number secnum = new number();
         int count = 0;      //текущий размер второго числа(для римской системы)
+        operation oper = new operation(); //обьект типа операция
         if (flag == 1) {    //если арабская система
             while (str.charAt(i) == ' ')//пропуск пробелов
                 i++;
             while (str.charAt(i) >= '0' && str.charAt(i) <= '9') {//пока элементы - число
-                firstnum = firstnum * 10 + str.charAt(i) - 48;//умножаем текущий число на 10, и прибавляем его на текущий символ
+                firstnum.value = firstnum.sub(firstnum.add(firstnum.mul(firstnum.value,10),str.charAt(i)),48);//умножаем текущий число на 10, и прибавляем его на текущий символ
                 i++;
             }
             while (!(str.charAt(i) >= '0' && str.charAt(i) <= '9')) //пока не второе число
                 i++;
             while (str.charAt(i) >= '0' && str.charAt(i) <= '9') { //такая же операция и со вторым числов
-                secnum = secnum * 10 + str.charAt(i) - 48;
+                secnum.value = secnum.sub(secnum.add(secnum.mul(secnum.value,10),str.charAt(i)),48);
                 i++;
                 if (i == str.length())
                     break;
             }
         }
         if (flag == 2) {//если римская система
-            while (str.charAt(i) == ' ')//пропуск пробелов
-                i++;
-            while (str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M') {
-                i++;//определяем размер первого числа
-                length1++;
-            }
+            firstnum.length = firstnum.findlength(str, i);
+            i+=firstnum.length;
             while (!(str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M'))
                 i++;
-            while (str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M') {
-                i++;//определяем размер второго числа
-                length2++;
-                if (i == str.length())
-                    break;
-            }
+            secnum.length = secnum.findlength(str, i);
             i = 0;//теперь считает первое число
             while (str.charAt(i) == ' ')
                 i++;
             while (str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M') {
-                if (count == length1 - 2) {//если текущий размер слова == размеру слова - 2
-                    int tmp = firstnum; //проверяем, изменилось ли слово, с момента запуска следующего метода
-                    firstnum = afterstr(str, firstnum, i);//запуск метода, который определяем число, если последние элементы
+                if (count == firstnum.length - 2) {//если текущий размер слова == размеру слова - 2
+                    double tmp = firstnum.value; //проверяем, изменилось ли слово, с момента запуска следующего метода
+                    firstnum.value = afterstr(str, firstnum.value, i);//запуск метода, который определяем число, если последние элементы
                     //поменялись местами (к примеру, IX  = 9)
-                    if (firstnum == tmp)//если число не поменялось, значит в числе нет таких ситуаций, описанных выше,
-                        firstnum = sum(str, i, firstnum);//значит просто запускаем метод sum
+                    System.out.println(tmp);
+                    System.out.println(firstnum.value);
+                    if (firstnum.value == tmp)//если число не поменялось, значит в числе нет таких ситуаций, описанных выше,
+                        firstnum.value = sum(str, i, firstnum.value);//значит просто запускаем метод sum
                     else
                         i++;
-
                 } else
-                    firstnum = sum(str, i, firstnum);//в обычной ситуации запускаем метод, который прибавляем к числу
+                    firstnum.value = sum(str, i, firstnum.value);//в обычной ситуации запускаем метод, который прибавляем к числу
                 count++;//другое число, в зависимости от символы строки
                 i++;
             }
@@ -127,72 +118,95 @@ public class Calculator {
             while (!(str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M'))
                 i++;
             while (str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M') {
-                if (count == length2 - 2) {//такая же ситуация и с вторым числом
-                    int tmp = secnum;
-                    secnum = afterstr(str, secnum, i);
-                    if (secnum == tmp)
-                        secnum = sum(str, i, secnum);
+                if (count == secnum.length - 2) {//такая же ситуация и с вторым числом
+                    double tmp = secnum.value;
+                    System.out.println(i);
+                    secnum.value = afterstr(str, secnum.value, i);
+                    if (secnum.value == tmp)
+                        secnum.value = sum(str, i, secnum.value);
                     else
                         i++;
                 } else
-                    secnum = sum(str, i, secnum);
+                    secnum.value = sum(str, i, secnum.value);
                 i++;
                 count++;
                 if (i == str.length())
                     break;
             }
         }
+        if(firstnum.checkcorrect(firstnum.value) == 0 || secnum.checkcorrect(secnum.value) == 0) {
+            System.out.println("Ошибка, число не входит в диапозон допустимых");
+            return ;
+        }
         i = 0;//теперь определяем операцию, и считаем результат
         while (str.charAt(i) != '*' && str.charAt(i) != '+' && str.charAt(i) != '-' && str.charAt(i) != '/')
             i++;
-        int tmp = 0;
+        number tmp = new number();
         if (str.charAt(i) == '*')
-            tmp = firstnum * secnum;
+            tmp.value = oper.mul(firstnum.value, secnum.value);
         if (str.charAt(i) == '+')
-            tmp = firstnum + secnum;
+            tmp.value = oper.add(firstnum.value, secnum.value);
         if (str.charAt(i) == '-')
-            tmp = firstnum - secnum;
+            tmp.value = oper.sub(firstnum.value, secnum.value);
         if (str.charAt(i) == '/') {
-            if (secnum == 0) {
+            if (secnum.value == 0) {
                 System.out.println("Ошибка");
                 return;
             } else
-                tmp = firstnum / secnum;
+                tmp.value = oper.div(firstnum.value, secnum.value);
         }
         if (flag == 1)//если арабская система счисления, то сразу выводим результат
-            System.out.println(tmp);
+            System.out.println(tmp.value);
         if (flag == 2) {//если римская, то
-            if (tmp < 0) {
+            if (tmp.value < 0) {
                 System.out.println("Ошибка, невозможно вывести отрицательное число в римской системе счисления");
                 return;
             }
-            while (tmp != 0) {//пока результат не обнулится, вычитаем из него числа, параллельно выводя их римские
-                if (tmp >= 1000) { //эквиваленты на экран
+            while (tmp.value > 0) {//пока результат не обнулится, вычитаем из него числа, параллельно выводя их римские
+                if (tmp.value >= 1000) { //эквиваленты на экран
                     System.out.print("M");
-                    tmp -= 1000;
-                } else if (tmp >= 500) {
+                    tmp.value -= 1000;
+                } else if (tmp.value >= 500) {
                     System.out.print("D");
-                    tmp -= 500;
-                } else if (tmp >= 100) {
+                    tmp.value -= 500;
+                } else if (tmp.value >= 100) {
                     System.out.print("C");
-                    tmp -= 100;
-                } else if (tmp >= 50) {
+                    tmp.value -= 100;
+                } else if (tmp.value >= 50) {
                     System.out.print("L");
-                    tmp -= 50;
-                } else if (tmp >= 10) {
+                    tmp.value -= 50;
+                }else if (tmp.value >= 40) {
+                    System.out.print("XL");
+                    tmp.value -= 40;
+                }else if (tmp.value >= 10) {
                     System.out.print("X");
-                    tmp -= 10;
-                } else if (tmp >= 5) {
+                    tmp.value -= 10;
+                }else if (tmp.value >= 9) {
+                    System.out.print("IX");
+                    tmp.value -= 9;
+                }else if (tmp.value >= 5) {
                     System.out.print("V");
-                    tmp -= 5;
-                } else if (tmp >= 1) {
+                    tmp.value -= 5;
+                }else if (tmp.value >= 4) {
+                    System.out.print("IV");
+                    tmp.value -= 4;
+                }else if (tmp.value >= 1) {
                     System.out.print("I");
-                    tmp -= 1;
+                    tmp.value -= 1;
+                }
+                if(tmp.value > 0 && tmp.value < 1)
+                {
+                    System.out.println(".");
+                    tmp.value*=10;
+                    while(tmp.value%10!=0)
+                    {
+                        tmp.value*=10;
+                    }
                 }
             }
         }
     }
-    static int afterstr(String str, int count, int i)//метод, в котором я расписал все ситуации,
+    static double afterstr(String str, double count, int i)//метод, в котором я расписал все ситуации,
     {//в которых возможна ситуация, когда символ римской цифры стоит не на свое месте, (что означаеи вычитание)
         if(str.charAt(i) == 'I')
         {
@@ -257,7 +271,7 @@ public class Calculator {
         return count;
 
     }
-    static int sum(String str, int i, int count)//метод, в котором подсчитывается сумма числа при нормальном условие
+    static double sum(String str, int i, double count)//метод, в котором подсчитывается сумма числа при нормальном условие
     {//(нормальное условие - надо складываться числа, а не вычитать
         if(str.charAt(i) == 'I')
             count = count + 1;
@@ -276,6 +290,51 @@ public class Calculator {
         return count;
     }
 }
-
+class operation
+{
+    double div(double firstnum, double secnum)
+    {
+        if(secnum!=0)
+            return firstnum / secnum;
+        else
+            return 0;
+    }
+    double mul(double firstnum, double secnum)
+    {
+        return firstnum * secnum;
+    }
+    double add(double firstnum, double secnum)
+    {
+        return firstnum + secnum;
+    }
+    double sub(double firstnum, double secnum)
+    {
+        return firstnum - secnum;
+    }
+}
+class number extends operation
+{
+    double value;
+    int length;
+    int checkcorrect(double number)
+    {
+        if(number < 0 || number > 10)
+            return 0;
+        return 1;
+    }
+    int findlength(String str, int i)
+    {
+        int len = 0;
+        while (str.charAt(i) == ' ')//пропуск пробелов
+            i++;
+        while (str.charAt(i) == 'I' || str.charAt(i) == 'V' || str.charAt(i) == 'X' || str.charAt(i) == 'L' || str.charAt(i) == 'C' || str.charAt(i) == 'D' || str.charAt(i) == 'M') {
+            i++;//определяем размер первого числа
+            len++;
+            if (i == str.length())
+                break;
+        }
+        return len;
+    }
+}
 
 
